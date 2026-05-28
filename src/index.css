@@ -1,0 +1,227 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Cairo", system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Base Body Style */
+body {
+  font-family: var(--font-sans);
+  background-color: #f8fafc;
+  color: #0f172a;
+  transition: background-color 0.2s ease, color 0.15s ease;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Gorgeous custom scrollbar */
+::-webkit-scrollbar {
+  width: 6.5px;
+  height: 6.5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Elegant Dark design theme overrides */
+body.dark-theme,
+.dark-theme {
+  background-color: #0A0B0E !important;
+  color: #E2E8F0 !important;
+}
+
+/* Base background maps */
+.dark-theme .bg-white,
+.dark-theme .bg-white\/95,
+.dark-theme [class*="bg-white"] {
+  background-color: #14161B !important;
+}
+
+.dark-theme .bg-slate-50,
+.dark-theme .bg-slate-100,
+.dark-theme .bg-slate-100\/80 {
+  background-color: #0F1115 !important;
+}
+
+.dark-theme .bg-slate-50\/50 {
+  background-color: #0A0B0E !important;
+}
+
+.dark-theme .bg-slate-200,
+.dark-theme .bg-slate-100 {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Text Element mappings - ensuring perfect color contrast */
+.dark-theme .text-slate-800,
+.dark-theme .text-slate-900,
+.dark-theme .text-slate-950,
+.dark-theme h1,
+.dark-theme h2,
+.dark-theme h3,
+.dark-theme h4,
+.dark-theme h5 {
+  color: #FFFFFF !important;
+}
+
+.dark-theme .text-slate-700,
+.dark-theme .text-slate-600 {
+  color: #E2E8F0 !important;
+}
+
+.dark-theme .text-slate-500,
+.dark-theme .text-slate-400 {
+  color: #94A3B8 !important;
+}
+
+.dark-theme .text-slate-300 {
+  color: #64748B !important;
+}
+
+/* Layout, Borders and Dividers from the design HTML (white/5 and white/10) */
+.dark-theme .border,
+.dark-theme .border-slate-100,
+.dark-theme .border-slate-150,
+.dark-theme .border-slate-200,
+.dark-theme .border-slate-200\/50,
+.dark-theme .border-slate-220,
+.dark-theme .border-slate-250\/40,
+.dark-theme .border-dashed,
+.dark-theme .divide-slate-100 > *,
+.dark-theme .divide-white\/5 > * {
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.dark-theme .border-white\/10 {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Navigation tabs, panels, lists and selectors */
+.dark-theme .bg-slate-50 .bg-white {
+  background-color: #1E2026 !important;
+}
+
+/* Styling Forms elements like Inputs, Textareas, Select option fields */
+.dark-theme input,
+.dark-theme select,
+.dark-theme textarea {
+  background-color: #0F1115 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #F8FAFC !important;
+}
+
+.dark-theme input::placeholder,
+.dark-theme textarea::placeholder {
+  color: #475569 !important;
+}
+
+.dark-theme input:focus,
+.dark-theme select:focus,
+.dark-theme textarea:focus {
+  border-color: rgba(245, 158, 11, 0.45) !important;
+  outline: none !important;
+}
+
+.dark-theme select option {
+  background-color: #14161B !important;
+  color: #E2E8F0 !important;
+}
+
+/* Modals & Backdrop Blur */
+.dark-theme .bg-slate-900\/30,
+.dark-theme .bg-slate-900\/40 {
+  background-color: rgba(5, 6, 8, 0.75) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* Align SaaS header values correctly */
+.dark-theme header {
+  background-color: #0F1115 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Mappings for primary buttons and accents into Golden Amber Theme */
+.dark-theme .bg-emerald-600,
+.dark-theme .bg-emerald-700 {
+  background-color: #F59E0B !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
+}
+
+.dark-theme .hover\:bg-emerald-700:hover,
+.dark-theme .hover\:bg-emerald-800:hover {
+  background-color: #D97706 !important;
+}
+
+.dark-theme .text-emerald-700,
+.dark-theme .text-emerald-600 {
+  color: #F59E0B !important;
+}
+
+.dark-theme .bg-emerald-50 {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+  color: #F59E0B !important;
+}
+
+.dark-theme .border-emerald-100,
+.dark-theme .border-emerald-200 {
+  border-color: rgba(245, 158, 11, 0.2) !important;
+}
+
+.dark-theme .text-emerald-800 {
+  color: #FBBF24 !important;
+}
+
+/* Customer specific card components */
+.dark-theme .divide-y > * {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.dark-theme .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.08) !important;
+  color: #FBBF24 !important;
+}
+
+.dark-theme .text-amber-800 {
+  color: #FBBF24 !important;
+}
+
+.dark-theme .bg-indigo-600 {
+  background-color: #4F46E5 !important;
+}
+
+.dark-theme .bg-indigo-50 {
+  background-color: rgba(79, 70, 229, 0.1) !important;
+  color: #818CF8 !important;
+}
+
+.dark-theme .text-indigo-600 {
+  color: #818CF8 !important;
+}
+
+/* Adjustments for shadow */
+.dark-theme .shadow-sm,
+.dark-theme .shadow-md,
+.dark-theme .shadow-lg,
+.dark-theme .shadow-xl,
+.dark-theme .shadow-2xl {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Custom gorgeous subtle glows */
+.glow-gold {
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.15);
+}
+.glow-emerald {
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+}

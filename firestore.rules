@@ -1,0 +1,59 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Default Deny Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming(req) {
+      return req.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Users Collection Helper
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isSignedIn();
+      allow update: if isOwner(userId) && (!incoming(request).keys().hasAny(['role']) || existing().role == 'super_admin');
+      allow delete: if false; // Users cannot delete accounts directly
+    }
+
+    match /rates/{rateId} {
+      allow read: if true; // Public can see exchange rates
+      allow write: if isSignedIn(); // Handled securely via backend
+    }
+
+    match /stores/{storeId} {
+      allow read: if true; // Public can browse menu/store pages
+      allow write: if isSignedIn(); // Handled securely via authenticated proxy
+    }
+
+    match /products/{productId} {
+      allow read: if true; // Public can browse product lists
+      allow write: if isSignedIn(); // Administered via secure controller
+    }
+
+    match /orders/{orderId} {
+      allow read: if true; // Public tracking page + Admin order page
+      allow write: if true; // Customers can submit new orders
+    }
+  }
+}

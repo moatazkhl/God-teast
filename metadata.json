@@ -1,0 +1,10 @@
+{
+  "name": "Logma SaaS - لقمة ساس",
+  "description": "منصة احترافية متكاملة لإنشاء وإدارة متاجر مطاعم ذكية مع دعم الطلبات، التوصيل، والاشتراكات.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

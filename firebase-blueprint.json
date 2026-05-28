@@ -1,0 +1,129 @@
+{
+  "entities": {
+    "Store": {
+      "title": "Store",
+      "description": "Store configuration and subscription details that represent a restaurant storefront.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the store" },
+        "nameAr": { "type": "string", "description": "Arabic name of the restaurant" },
+        "nameEn": { "type": "string", "description": "English name of the restaurant" },
+        "descAr": { "type": "string", "description": "Arabic description of the restaurant" },
+        "descEn": { "type": "string", "description": "English description of the restaurant" },
+        "phone": { "type": "string", "description": "Contact phone number" },
+        "whatsapp": { "type": "string", "description": "WhatsApp contact number" },
+        "logo": { "type": "string", "description": "URL to the logo image" },
+        "banner": { "type": "string", "description": "URL to the banner/cover image" },
+        "workingHours": { "type": "string", "description": "Working hours details" },
+        "isOpen": { "type": "boolean", "description": "Whether the store is currently accepting orders" },
+        "rating": { "type": "number", "description": "Average review rating" },
+        "reviewsCount": { "type": "number", "description": "Total number of reviews" },
+        "couponCode": { "type": "string", "description": "SaaS store discount coupon" },
+        "couponDiscountPercent": { "type": "number", "description": "Percentage discount for coupon" },
+        "plan": { "type": "string", "enum": ["Free", "Gold"], "description": "Subscription plan" },
+        "subscriptionExpires": { "type": "string", "description": "Expiration date format YYYY-MM-DD" },
+        "branches": { "type": "array", "description": "Branches list" },
+        "loyaltyPointsPer10k": { "type": "number", "description": "Loyalty points earned per 10,000 SYP" },
+        "isApproved": { "type": "boolean", "description": "SaaS approval flag" },
+        "isSuspended": { "type": "boolean", "description": "SaaS suspension flag" },
+        "requestedUpgrade": { "type": "boolean", "description": "SaaS upgrade requested flag" },
+        "paymentReference": { "type": "string", "description": "Audit tracking reference for payments" }
+      },
+      "required": ["id", "nameAr", "nameEn", "phone", "plan"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "A food item or dish inside a restaurant's menu.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique product ID" },
+        "storeId": { "type": "string", "description": "Associated store ID" },
+        "nameAr": { "type": "string", "description": "Arabic product name" },
+        "nameEn": { "type": "string", "description": "English product name" },
+        "descAr": { "type": "string", "description": "Arabic product description" },
+        "descEn": { "type": "string", "description": "English product description" },
+        "category": { "type": "string", "description": "Category name" },
+        "priceSYP": { "type": "number", "description": "Price in Syrian Pounds" },
+        "image": { "type": "string", "description": "URL of the product image" },
+        "inStock": { "type": "boolean", "description": "Whether product is in stock" },
+        "isHidden": { "type": "boolean", "description": "Whether the product is hidden on the web app" },
+        "extras": { "type": "array", "description": "Product extra add-ons" }
+      },
+      "required": ["id", "storeId", "nameAr", "priceSYP"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "A customer order submitted to a restaurant.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique order identifier" },
+        "storeId": { "type": "string", "description": "Associated store ID" },
+        "customerName": { "type": "string", "description": "Name of the customer" },
+        "customerPhone": { "type": "string", "description": "Phone number of the customer" },
+        "customerAddress": { "type": "string", "description": "Detailed physical delivery address" },
+        "notes": { "type": "string", "description": "Optional notes from the customer" },
+        "deliveryZone": { "type": "object", "description": "Selected zone details and fees" },
+        "items": { "type": "array", "description": "List of ordered products and counts" },
+        "paymentMethod": { "type": "string", "description": "Payment type choice" },
+        "subtotalSYP": { "type": "number", "description": "Subtotal cost" },
+        "discountSYP": { "type": "number", "description": "Calculated coupon discount" },
+        "deliveryFeeSYP": { "type": "number", "description": "Delivery fee" },
+        "totalSYP": { "type": "number", "description": "Total checkout price in Syrian Pounds" },
+        "status": { "type": "string", "enum": ["pending", "accepted", "preparing", "delivering", "delivered", "cancelled"], "description": "Current order flow status" },
+        "createdAt": { "type": "string", "description": "Timestamp when order was submitted" },
+        "invoiceNumber": { "type": "string", "description": "Invoice sequence number" },
+        "customerUsername": { "type": "string", "description": "Optional registered username" }
+      },
+      "required": ["id", "storeId", "customerName", "customerPhone", "customerAddress", "totalSYP", "status"]
+    },
+    "User": {
+      "title": "User",
+      "description": "Registered SaaS user, including restaurant owners, customers, and super admin.",
+      "type": "object",
+      "properties": {
+        "username": { "type": "string", "description": "Unique username and primary login ID" },
+        "password": { "type": "string", "description": "Login password" },
+        "role": { "type": "string", "enum": ["super_admin", "restaurant_owner", "customer"], "description": "SaaS permission level" },
+        "email": { "type": "string", "description": "Contact Email address" },
+        "phone": { "type": "string", "description": "Owner/customer phone number" },
+        "storeId": { "type": "string", "description": "Associated store if restaurant owner role" },
+        "name": { "type": "string", "description": "Real name" },
+        "address": { "type": "string", "description": "Customer address" }
+      },
+      "required": ["username", "password", "role"]
+    },
+    "CurrencyRate": {
+      "title": "CurrencyRate",
+      "description": "Real-time exchange rates to display menu prices in foreign currencies.",
+      "type": "object",
+      "properties": {
+        "USD": { "type": "number", "description": "SYP exchange rate per USD" },
+        "EUR": { "type": "number", "description": "SYP exchange rate per EUR" },
+        "TRY": { "type": "number", "description": "SYP exchange rate per TRY" }
+      },
+      "required": ["USD", "EUR", "TRY"]
+    }
+  },
+  "firestore": {
+    "/stores/{storeId}": {
+      "schema": { "$ref": "#/entities/Store" },
+      "description": "Restaurant storefront configurations"
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Menu products across all restaurants"
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Customer orders made across all restaurants"
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Customer, restaurant owner, and admin accounts"
+    },
+    "/rates/current": {
+      "schema": { "$ref": "#/entities/CurrencyRate" },
+      "description": "Underlying currency pricing values"
+    }
+  }
+}
