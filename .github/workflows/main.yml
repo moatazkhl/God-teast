@@ -20,12 +20,18 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
 
+    # خطوة هامة لإعطاء صلاحية التنفيذ للملف داخل مجلد android
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+      working-directory: ./android
+
+    # خطوة البناء مع تحديد المجلد الصحيح
     - name: Build with Gradle
       run: ./gradlew assembleDebug
-      working-directory: ./اسم_المجلد_الفرعي # احذفه بالكامل إذا كانت ملفاتك في المجلد الرئيسي مباشرة
+      working-directory: ./android
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: my-app-apk
-        path: "**/build/outputs/apk/debug/*.apk"
+        path: "android/app/build/outputs/apk/debug/*.apk"
