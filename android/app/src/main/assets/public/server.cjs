@@ -45,7 +45,7 @@ var firebase_applet_config_default = {
 // server.ts
 import_dotenv.default.config();
 var appFirebase = (0, import_app.initializeApp)(firebase_applet_config_default);
-var db = (0, import_firestore.getFirestore)(appFirebase);
+var db = (0, import_firestore.getFirestore)(appFirebase, firebase_applet_config_default.firestoreDatabaseId);
 var aiClient = null;
 function getGeminiClient() {
   const key = process.env.GEMINI_API_KEY;
@@ -67,6 +67,21 @@ function getGeminiClient() {
 var app = (0, import_express.default)();
 app.use(import_express.default.json({ limit: "50mb" }));
 app.use(import_express.default.urlencoded({ limit: "50mb", extended: true }));
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  } else {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+  }
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Accept");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
 var PORT = 3e3;
 var currencyRates = {
   USD: 14500,
@@ -1063,7 +1078,6 @@ app.post("/api/gemini/translate-menu", async (req, res) => {
   }
 });
 async function startServer() {
-  await initializeDatabase();
   if (process.env.NODE_ENV !== "production") {
     const vite = await (0, import_vite.createServer)({
       server: { middlewareMode: true },
@@ -1079,6 +1093,9 @@ async function startServer() {
   }
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on port ${PORT}`);
+    initializeDatabase().catch((err) => {
+      console.error("Delayed database initialization failed:", err);
+    });
   });
 }
 startServer();

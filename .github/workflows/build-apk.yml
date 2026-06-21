@@ -23,13 +23,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
           cache: 'npm'
 
-      - name: Setup Java JDK 21
+      - name: Setup Java JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '17'
           distribution: 'zulu'
 
       - name: Install dependencies
@@ -41,24 +41,27 @@ jobs:
       - name: Sync assets to Android
         run: npx cap sync android
 
-      - name: Fix Corrupt Launcher Icons
-        run: |
-          echo "حذف الأيقونات الدائرية التالفة..."
-          find android/app/src/main/res/ -name "ic_launcher_round.png" -delete
-
-      - name: Update Gradle Wrapper
-        working-directory: ./android
-        run: gradle wrapper
-
       - name: Grant execution permission for gradlew
         run: chmod +x android/gradlew
 
       - name: Build Debug APK
-        working-directory: ./android
-        run: ./gradlew assembleDebug
+        run: |
+          cd android
+          ./gradlew assembleDebug
+
+      - name: Build Unsigned Release APK
+        run: |
+          cd android
+          ./gradlew assembleRelease
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: Logma-Debug-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Upload Release APK (Unsigned)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Logma-Release-Unsigned-APK
+          path: android/app/build/outputs/apk/release/app-release-unsigned.apk
