@@ -58,6 +58,7 @@ export interface Store {
   pendingPaymentReference?: string;
   pendingUpgradeType?: "monthly" | "annual";
   pendingUpgradeMonths?: number;
+  createdAt?: string;
 }
 
 export interface CartItem {

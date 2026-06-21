@@ -1731,8 +1731,8 @@ export default function OwnerDashboard({
                   </span>
                   <div className="flex flex-col sm:flex-row-reverse gap-3 items-center">
                     {/* Logo click area */}
-                    <div
-                      onClick={() => settingsLogoFileInputRef.current?.click()}
+                    <label
+                      htmlFor="settings-logo-upload"
                       className="w-24 h-24 border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/25 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all relative overflow-hidden group shrink-0"
                     >
                       {logoUploading ? (
@@ -1743,7 +1743,7 @@ export default function OwnerDashboard({
                           <span className="text-[10px] font-bold text-indigo-700">{isAr ? "تحميل صورة" : "Choose File"}</span>
                         </div>
                       )}
-                    </div>
+                    </label>
                     <input
                       ref={settingsLogoFileInputRef}
                       id="settings-logo-upload"
@@ -1754,7 +1754,7 @@ export default function OwnerDashboard({
                         if (file) compressAndSetSettingsImage(file, "logo");
                         e.target.value = "";
                       }}
-                      className="hidden"
+                      style={{ opacity: 0, position: "absolute", width: "1px", height: "1px", zIndex: -10, pointerEvents: "none" }}
                     />
 
                     {/* Logo Preview */}
@@ -1794,8 +1794,8 @@ export default function OwnerDashboard({
                   </span>
                   <div className="flex flex-col sm:flex-row-reverse gap-3 items-center">
                     {/* Banner click area */}
-                    <div
-                      onClick={() => settingsBannerFileInputRef.current?.click()}
+                    <label
+                      htmlFor="settings-banner-upload"
                       className="w-24 h-24 border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/25 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all relative overflow-hidden group shrink-0"
                     >
                       {bannerUploading ? (
@@ -1806,7 +1806,7 @@ export default function OwnerDashboard({
                           <span className="text-[10px] font-bold text-indigo-700">{isAr ? "تحميل صورة" : "Choose File"}</span>
                         </div>
                       )}
-                    </div>
+                    </label>
                     <input
                       ref={settingsBannerFileInputRef}
                       id="settings-banner-upload"
@@ -1817,7 +1817,7 @@ export default function OwnerDashboard({
                         if (file) compressAndSetSettingsImage(file, "banner");
                         e.target.value = "";
                       }}
-                      className="hidden"
+                      style={{ opacity: 0, position: "absolute", width: "1px", height: "1px", zIndex: -10, pointerEvents: "none" }}
                     />
 
                     {/* Banner Preview */}
@@ -1893,10 +1893,14 @@ export default function OwnerDashboard({
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 text-xs font-mono">
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-2 text-xs font-mono">
+                  <div className="bg-white px-3.5 py-2.5 rounded-xl border border-slate-100">
+                    <span className="text-slate-400 text-[10px] uppercase font-sans block">{isAr ? "تاريخ تسجيل المشترك" : "Registration Date"}:</span>
+                    <span className="font-bold text-slate-800">{store.createdAt || "2026-05-28"}</span>
+                  </div>
                   <div className="bg-white px-3.5 py-2.5 rounded-xl border border-slate-100">
                     <span className="text-slate-400 text-[10px] uppercase font-sans block">{isAr ? "صلاحية الاشتراك" : "Expires On"}:</span>
-                    <span className="font-bold text-slate-800">{store.subscriptionExpires}</span>
+                    <span className="font-bold text-indigo-700">{store.subscriptionExpires}</span>
                   </div>
                   <div className="bg-white px-3.5 py-2.5 rounded-xl border border-slate-100">
                     <span className="text-slate-400 text-[10px] uppercase font-sans block">{isAr ? "نوع الباقة المعطاة" : "Subscription Plan"}:</span>
@@ -1979,7 +1983,7 @@ export default function OwnerDashboard({
               </div>
             ) : (
               <div className="bg-slate-50 border border-slate-200/60 rounded-2xl p-5 space-y-4">
-                <div className="space-y-1 text-right">
+                <div className="space-y-1.5 text-right">
                   <span className="text-slate-800 font-bold text-xs flex items-center gap-1 justify-end">
                     <span>💡</span>
                     <span>{isAr ? "أنت مشترك في الباقة التجريبية المجانية" : "You are currently on the Free Trial"}</span>
@@ -1989,6 +1993,18 @@ export default function OwnerDashboard({
                       ? "الحسابات المجانية محدودة بـ 10 وجبات كحد أقصى في قائمة الطعام، وبدون تخصيص تتبع السائقين GPS المباشر للزبائن. قم بالترقية الآن واستمتع بمبيعات غير محدودة!"
                       : "Free Trial accounts are restricted to 10 menu items and lack live GPS driver simulation tracking for clients. Go premium now!"}
                   </p>
+
+                  {/* Subscriber registration details */}
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 justify-end pt-1.5 border-t border-slate-200/50 text-[10px] text-slate-400 font-sans">
+                    <div>
+                      {isAr ? "تاريخ تسجيل المشترك:" : "Registration Date:"}{" "}
+                      <strong className="text-slate-600 font-mono">{store.createdAt || "2026-05-28"}</strong>
+                    </div>
+                    <div className="rtl:mr-2">
+                      {isAr ? "انتهاء الفترة التجريبية:" : "Trial Expires On:"}{" "}
+                      <strong className="text-indigo-600 font-mono">{store.subscriptionExpires}</strong>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-3">
@@ -2341,9 +2357,9 @@ export default function OwnerDashboard({
                 {/* Main Interactive Upload Area */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-stretch">
                   <div className="flex flex-col justify-center">
-                    {/* Programmatic click and a standard button for fallback */}
-                    <div 
-                      onClick={() => productFileInputRef.current?.click()}
+                    {/* Programmatic click and a standard input label fallback */}
+                    <label 
+                      htmlFor="product-image-upload"
                       className="border-2 border-dashed border-indigo-200 hover:border-indigo-400 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all bg-indigo-50/20 hover:bg-indigo-50/40 min-h-[140px] text-center relative overflow-hidden group"
                     >
                       {imageUploading ? (
@@ -2354,7 +2370,7 @@ export default function OwnerDashboard({
                           </span>
                         </div>
                       ) : (
-                        <div className="flex flex-col items-center gap-1.5 p-2">
+                        <div className="flex flex-col items-center gap-1.5 p-2 animate-fade-in">
                           <div className="bg-white p-2.5 rounded-full shadow-xs border border-indigo-100 group-hover:scale-110 transition-transform text-indigo-600">
                             <Upload size={20} />
                           </div>
@@ -2364,22 +2380,21 @@ export default function OwnerDashboard({
                           <span className="text-[10px] text-slate-400 font-semibold">
                             {isAr ? "يدعم كافة صيغ الصور وسيقوم بضغطها تلقائياً" : "Supports all image types, auto-compressed"}
                           </span>
-                          <button
-                            type="button"
-                            className="mt-2 bg-indigo-650 hover:bg-indigo-700 text-white font-black text-[10px] px-3.5 py-1.5 rounded-xl transition-all shadow-xs"
+                          <span
+                            className="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[10px] px-3.5 py-1.5 rounded-xl transition-all shadow-xs inline-block"
                           >
                             {isAr ? "تصفح الصور بالهاتف / الكمبيوتر" : "Browse Device Files"}
-                          </button>
+                          </span>
                         </div>
                       )}
-                    </div>
+                    </label>
                     <input
                       ref={productFileInputRef}
                       id="product-image-upload"
                       type="file"
                       accept="image/*"
                       onChange={handleImageFileChange}
-                      className="hidden"
+                      style={{ opacity: 0, position: "absolute", width: "1px", height: "1px", zIndex: -10, pointerEvents: "none" }}
                     />
                   </div>
 

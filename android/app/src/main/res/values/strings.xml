@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">لقمة ساس - Logma</string>
+    <string name="title_activity_main">لقمة ساس - Logma</string>
+    <string name="package_name">com.logmasaas.app</string>
+    <string name="custom_url_scheme">com.logmasaas.app</string>
+</resources>

@@ -19,7 +19,7 @@ dotenv.config();
 
 // Initialize Firebase SDK
 const appFirebase = initializeApp(firebaseConfig);
-const db = getFirestore(appFirebase);
+const db = getFirestore(appFirebase, firebaseConfig.firestoreDatabaseId);
 
 // Standard models list 'gemini-3.5-flash'
 let aiClient: GoogleGenAI | null = null;
@@ -96,6 +96,7 @@ interface Store {
   pendingPaymentReference?: string;
   pendingUpgradeType?: "monthly" | "annual";
   pendingUpgradeMonths?: number;
+  createdAt?: string;
 }
 
 interface Order {
@@ -274,6 +275,7 @@ const DEFAULT_STORES: Store[] = [
     couponDiscountPercent: 10,
     plan: "Gold",
     subscriptionExpires: "2027-04-15",
+    createdAt: "2026-04-15",
     branches: ["فرع المزة - دمشق", "فرع مشروع دمر"],
     loyaltyPointsPer10k: 15,
     printerIp: "192.168.1.100",
@@ -303,6 +305,7 @@ const DEFAULT_STORES: Store[] = [
     couponDiscountPercent: 20,
     plan: "Gold",
     subscriptionExpires: "2026-12-31",
+    createdAt: "2026-03-01",
     branches: ["فرع كفرسوسة"],
     loyaltyPointsPer10k: 10,
     isApproved: true,
@@ -330,6 +333,7 @@ const DEFAULT_STORES: Store[] = [
     couponDiscountPercent: 15,
     plan: "Free",
     subscriptionExpires: "2026-06-15",
+    createdAt: "2026-05-15",
     branches: ["فرع الميدان الرئيسي", "فرع الشعلان"],
     loyaltyPointsPer10k: 5,
     isApproved: true,
@@ -628,6 +632,7 @@ app.post("/api/auth/login", async (req, res) => {
         reviewsCount: 1,
         plan: plan || "Free",
         subscriptionExpires: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 14 days free trial expiration
+        createdAt: new Date().toISOString().split("T")[0],
         branches: ["الفرع الرئيسي"],
         loyaltyPointsPer10k: 5,
         isApproved: false, // ALL newly registered stores await Super Admin approval
@@ -818,24 +823,25 @@ app.post("/api/admin/stores/:id/approve-upgrade", async (req, res) => {
   const store = stores.find(s => s.id === req.params.id);
   if (!store) return res.status(404).json({ error: "المطعم غير موجود" });
   
+  const oldPlan = store.plan;
   store.plan = "Gold";
   // Determine duration in months
   const months = store.pendingUpgradeMonths || (store.pendingUpgradeType === "annual" ? 12 : 1);
   store.subscriptionType = store.pendingUpgradeType || (months === 12 ? "annual" : "monthly");
   store.subscriptionMonths = months;
-  const days = months * 30;
-  const durationMs = days * 24 * 60 * 60 * 1000;
   
-  // If the store already has an active Gold subscription that hasn't expired yet, we extend it. Otherwise, start from today (Date.now())
-  let baseTime = Date.now();
-  if (store.subscriptionExpires) {
-    const currentExpire = new Date(store.subscriptionExpires).getTime();
-    if (currentExpire > baseTime) {
-      baseTime = currentExpire;
+  // Calculate exact calendar months based subscription expiration
+  let expireDate = new Date();
+  if (store.subscriptionExpires && oldPlan === "Gold") {
+    const currentExpire = new Date(store.subscriptionExpires);
+    if (currentExpire.getTime() > Date.now()) {
+      expireDate = currentExpire;
     }
   }
-
-  store.subscriptionExpires = new Date(baseTime + durationMs).toISOString().split("T")[0];
+  
+  // Add exact months natively using setMonth to handle 30/31/28 days and leap years perfectly
+  expireDate.setMonth(expireDate.getMonth() + months);
+  store.subscriptionExpires = expireDate.toISOString().split("T")[0];
   store.requestedUpgrade = false;
   // Store validated details
   store.paymentMethod = store.pendingPaymentMethod || "Confirmed Upgrade";
@@ -951,8 +957,27 @@ app.put("/api/stores/:id/subscription", async (req, res) => {
   if (!store) return res.status(404).json({ error: "المطعم غير موجود" });
 
   const { plan, durationMonths } = req.body; // plan 'Gold', duration 1 or 12 months
+  const oldPlan = store.plan;
   store.plan = plan;
-  store.subscriptionExpires = new Date(Date.now() + durationMonths * 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+
+  if (plan === "Gold") {
+    let expireDate = new Date();
+    if (store.subscriptionExpires && oldPlan === "Gold") {
+      const currentExpire = new Date(store.subscriptionExpires);
+      if (currentExpire.getTime() > Date.now()) {
+        expireDate = currentExpire;
+      }
+    }
+    // Set exact calendar month additions natively
+    expireDate.setMonth(expireDate.getMonth() + (durationMonths || 1));
+    store.subscriptionExpires = expireDate.toISOString().split("T")[0];
+  } else {
+    // For free plan, set 14 days expiration from registration or today
+    const regDate = store.createdAt ? new Date(store.createdAt) : new Date();
+    const expireDate = new Date(regDate.getTime() + 14 * 24 * 60 * 60 * 1000);
+    store.subscriptionExpires = expireDate.toISOString().split("T")[0];
+  }
+
   try {
     await setDoc(doc(db, "stores", store.id), store);
   } catch (err) {
@@ -1245,8 +1270,6 @@ app.post("/api/gemini/translate-menu", async (req, res) => {
 
 // Serve static assets out of /dist or integrate Vite middleware for dev runtime
 async function startServer() {
-  await initializeDatabase();
-
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -1263,6 +1286,10 @@ async function startServer() {
 
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on port ${PORT}`);
+    // Warm up database asynchronously to avoid blocking the Cloud Run startup tick
+    initializeDatabase().catch((err) => {
+      console.error("Delayed database initialization failed:", err);
+    });
   });
 }
 

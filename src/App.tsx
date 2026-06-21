@@ -4,7 +4,7 @@ import SaaSOverview from "./components/SaaSOverview";
 import CustomerStorefront from "./components/CustomerStorefront";
 import OwnerDashboard from "./components/OwnerDashboard";
 import CustomerOrdersTracker from "./components/CustomerOrdersTracker";
-import { ListCollapse, LogIn, LogOut, Award, RefreshCw, Star, ArrowRight, Settings, LayoutDashboard, Globe, ChevronDown, Check, Info, ShieldCheck, Sun, Moon, TrendingUp, DollarSign } from "lucide-react";
+import { ListCollapse, LogIn, LogOut, Award, RefreshCw, Star, ArrowRight, Settings, LayoutDashboard, Globe, ChevronDown, Check, Info, ShieldCheck, Sun, Moon, TrendingUp, DollarSign, Smartphone } from "lucide-react";
 
 export default function App() {
   // Global App States
@@ -39,11 +39,17 @@ export default function App() {
   // Helper to calculate days remaining until subscription expires
   const getDaysRemaining = (expireStr: string) => {
     if (!expireStr) return 0;
-    const expireDate = new Date(expireStr);
+    const parts = expireStr.split("-");
+    if (parts.length < 3) return 0;
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const day = parseInt(parts[2], 10);
+    
+    // Construct in local timezone to avoid UTC mismatch off-by-one errors
+    const expireDate = new Date(year, month, day, 0, 0, 0, 0);
     const today = new Date();
-    // Zero out hours to calculate exact day differences
-    expireDate.setHours(0, 0, 0, 0);
     today.setHours(0, 0, 0, 0);
+    
     const diffTime = expireDate.getTime() - today.getTime();
     return Math.round(diffTime / (1000 * 60 * 60 * 24));
   };
@@ -63,6 +69,10 @@ export default function App() {
   });
   const [loginError, setLoginError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Android Settings States
+  const [showAndroidServerModal, setShowAndroidServerModal] = useState(false);
+  const [androidServerUrl, setAndroidServerUrl] = useState(localStorage.getItem('backend_url') || "https://ais-pre-4cqcy7ci4xtp542lrh3kfz-807175329121.europe-west2.run.app");
 
   // Admin Dashboard States
   const [rateUSD, setRateUSD] = useState(14500);
@@ -627,6 +637,19 @@ export default function App() {
                 ))}
               </div>
             </div>
+
+            {/* Android Connection Setting */}
+            <button
+              onClick={() => {
+                setAndroidServerUrl(localStorage.getItem('backend_url') || "https://ais-pre-4cqcy7ci4xtp542lrh3kfz-807175329121.europe-west2.run.app");
+                setShowAndroidServerModal(true);
+              }}
+              className="bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 p-2 rounded-xl border border-slate-200/50 cursor-pointer flex items-center gap-1.5"
+              title={isAr ? "إعدادات اتصال الأندرويد" : "Android Server Connection"}
+            >
+              <Smartphone size={14} />
+              <span className="hidden md:inline text-[10px] font-bold">{isAr ? "اتصال أندرويد" : "Android API"}</span>
+            </button>
 
             {/* Theme selector */}
             <button
@@ -1205,6 +1228,11 @@ export default function App() {
                                         )}
                                       </strong>
                                     </div>
+                                    {st.createdAt && (
+                                      <div className="text-[10px] text-slate-500 font-sans mt-0.5">
+                                        📅 {isAr ? "تاريخ تسجيل المشترك:" : "Joined:"} <strong className="text-slate-700 font-mono">{st.createdAt}</strong>
+                                      </div>
+                                    )}
                                     <div className="mt-1 flex items-center gap-1.5 text-[10px] text-slate-500">
                                       <span>{isAr ? "جوال صاحب المطعم:" : "Phone:"}</span>
                                       {st.phone ? (
@@ -1314,6 +1342,81 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      {/* DIALOG ANDROID SERVER SETTINGS MODAL */}
+      {showAndroidServerModal && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-900 max-w-md w-full rounded-3xl p-6 space-y-6 shadow-2xl border border-slate-150 dark:border-slate-800 text-right">
+            <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
+              <h3 className="font-extrabold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
+                <span>📱</span>
+                {isAr ? "إعدادات اتصال الأندرويد" : "Android Server Configuration"}
+              </h3>
+              <button
+                onClick={() => setShowAndroidServerModal(false)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer text-lg"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                {isAr 
+                  ? "تحديد خادم الـ API للمنصة عندما تعمل كـ تطبيق هجين (Android APK) على محاكي أو جوال حقيقي لتوجيه الطلبات بنجاح."
+                  : "Specify the main API Backend URL to successfully communicate when running the platform as an Android native hybrid application."}
+              </p>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-slate-400 block">
+                  {isAr ? "عنوان خادم الـ API الحالي" : "Current API Server URL"}
+                </label>
+                <input
+                  type="text"
+                  value={androidServerUrl}
+                  onChange={(e) => setAndroidServerUrl(e.target.value)}
+                  placeholder="https://example.com"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-150 dark:border-slate-800 px-3.5 py-2.5 rounded-xl text-xs font-mono text-left text-slate-800 dark:text-slate-200"
+                />
+              </div>
+
+              <div className="bg-amber-500/10 border border-amber-500/20 text-amber-600 rounded-xl p-3 text-[10px] space-y-1">
+                <span className="font-bold block">💡 {isAr ? "عناوين مفيدة:" : "Quick references:"}</span>
+                <div className="font-mono space-y-0.5">
+                  <div>• {isAr ? "المنصة الحية:" : "Live system:"} <span className="underline">https://ais-pre-4cqcy7ci4xtp542lrh3kfz-807175329121.europe-west2.run.app</span></div>
+                  <div>• {isAr ? "لوحة التطوير:" : "Development system:"} <span className="underline">https://ais-dev-4cqcy7ci4xtp542lrh3kfz-807175329121.europe-west2.run.app</span></div>
+                  <div>• {isAr ? "محاكي أندرويد (تطوير محلي):" : "Android Emulator (local PC):"} <span className="underline">http://10.0.2.2:3000</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-start gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <button
+                onClick={() => {
+                  localStorage.setItem('backend_url', androidServerUrl);
+                  setShowAndroidServerModal(false);
+                  window.location.reload();
+                }}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold cursor-pointer transition-all"
+              >
+                {isAr ? "حفظ وإعادة تحميل" : "Save & Reload"}
+              </button>
+              <button
+                onClick={() => {
+                  const defaultBackend = 'https://ais-pre-4cqcy7ci4xtp542lrh3kfz-807175329121.europe-west2.run.app';
+                  setAndroidServerUrl(defaultBackend);
+                  localStorage.setItem('backend_url', defaultBackend);
+                  setShowAndroidServerModal(false);
+                  window.location.reload();
+                }}
+                className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 px-4 py-2 rounded-xl text-xs font-bold cursor-pointer transition-all"
+              >
+                {isAr ? "استعادة الافتراضي" : "Reset Default"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* DIALOG LOGIN MODAL */}
       {showLoginModal && (
