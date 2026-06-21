@@ -43,7 +43,7 @@ jobs:
 
       - name: Fix Corrupt Launcher Icons
         run: |
-          echo "حذف الأيقونات الدائرية التالفة لتجنب فشل البناء..."
+          echo "حذف الأيقونات الدائرية التالفة..."
           find android/app/src/main/res/ -name "ic_launcher_round.png" -delete
 
       - name: Update Gradle Wrapper
@@ -59,7 +59,7 @@ jobs:
 
       - name: Build Unsigned Release APK
         working-directory: ./android
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleRelease -Xxlint:none -Pandroid.bundle.enableUncompressedNativeLibs=false
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
