@@ -41,6 +41,10 @@ jobs:
       - name: Sync assets to Android
         run: npx cap sync android
 
+      - name: Update Gradle Wrapper (Fix Corrupt Jar)
+        working-directory: ./android
+        run: gradle wrapper
+
       - name: Grant execution permission for gradlew
         run: chmod +x android/gradlew
 
