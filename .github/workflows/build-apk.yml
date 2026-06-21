@@ -57,18 +57,8 @@ jobs:
         working-directory: ./android
         run: ./gradlew assembleDebug
 
-      - name: Build Unsigned Release APK
-        working-directory: ./android
-        run: ./gradlew assembleRelease -Xxlint:none -Pandroid.bundle.enableUncompressedNativeLibs=false
-
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: Logma-Debug-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
-
-      - name: Upload Release APK (Unsigned)
-        uses: actions/upload-artifact@v4
-        with:
-          name: Logma-Release-Unsigned-APK
-          path: android/app/build/outputs/apk/release/app-release-unsigned.apk
